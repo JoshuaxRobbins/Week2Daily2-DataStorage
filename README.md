@@ -1,7 +1,8 @@
 # Week2Daily2-DataStorage
 
-Able to select image from your gallery and store it into database creating a primary key for it.
-Can retrieve those images with primary key //Not entirely working yet
+Take a picture and store it in database with auto generated primary key.
+Can update the image, delete the image, or save it.
+Can also drop the table.
 
 Able to write a string to a file and read it back
 
