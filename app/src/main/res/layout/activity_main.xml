@@ -15,8 +15,9 @@
         android:text="Primary Key" />
 
     <ImageView
+        android:layout_gravity="center"
         android:id="@+id/ivPicture"
-        android:layout_width="wrap_content"
+        android:layout_width="300dp"
         android:layout_height="300dp" />
 
     <EditText
@@ -60,8 +61,8 @@
             android:id="@+id/btnGetPicture"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="getPicture"
-            android:text="Select Picture" />
+            android:onClick="takePicture"
+            android:text="Take Picture" />
 
 
         <Button
@@ -71,6 +72,31 @@
             android:layout_weight="1"
             android:onClick="loadSave"
             android:text="Update" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="loadSave"
+            android:text="Delete" />
+
+        <Button
+            android:id="@+id/btnDrop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:onClick="loadSave"
+            android:text="Drop" />
 
     </LinearLayout>
 

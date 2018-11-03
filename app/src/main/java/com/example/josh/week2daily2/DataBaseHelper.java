@@ -6,70 +6,72 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.util.Log;
+import android.widget.Toast;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
-    public static final String dbName = "pictureDB";
-    public static final int version = 1;
-    public static String key = "1";
+    public static final String TAG = "_TAG";
 
-    public static final String CREATE_PICTURES_TABLE =
-            "CREATE TABLE " + PictureContract.FeedEntry.TABLE_NAME + "(" +
-                    PictureContract.FeedEntry.KEY + " INTEGER PRIMARY KEY, " +
-                    PictureContract.FeedEntry.PICTURE +  " BLOB)";
-
-    public static final String FIND_PICTURE =
-            "SELECT picture FROM " + PictureContract.FeedEntry.TABLE_NAME +
-                    "WHERE " + PictureContract.FeedEntry.KEY + " = " + key;
-
-
-
-    public DataBaseHelper(Context context) {
-        super(context, dbName, null, version);
+    public DataBaseHelper(@NonNull Context context) {
+        super(context, PictureContract.NAME, null, PictureContract.VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_PICTURES_TABLE);
+        db.execSQL(PictureContract.CREATE_TABLE);
+        Log.d(TAG, "onCreate: ");
     }
-
-    public void savePicture(byte[] picture ){
-        SQLiteDatabase db = this.getWritableDatabase();
-        String insertSQL = "INSERT INTO PICTURETABLE (keys,picture) VALUES(?,?)";
-        SQLiteStatement insert = db.compileStatement(insertSQL);
-        insert.clearBindings();
-        insert.bindBlob(2,picture);
-        insert.executeInsert();
-        db.close();
-
-    }
-
-    public byte[] getPicture(String key){
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("SELECT picture FROM picturetable WHERE " +
-            "keys = ?",new String[] {key});
-        cursor.moveToFirst();
-        return cursor.getBlob(2);
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        
+    }
 
+    public long saveImage(byte[] bytePicture){
+        SQLiteDatabase database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PictureContract.FeedEntry.COL_PICTURE,bytePicture);
+        long rowId = database.insert(PictureContract.FeedEntry.TABLE_NAME,null,contentValues);
+        return rowId;
+    }
+    public long updateImage(byte[] bytePicture, String key){
+        Log.d(TAG, "updateImage: " + key);
+        SQLiteDatabase database = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PictureContract.FeedEntry._ID,key);
+        contentValues.put(PictureContract.FeedEntry.COL_PICTURE,bytePicture);
+        long rowId = database.update(PictureContract.FeedEntry.TABLE_NAME,contentValues,PictureContract.UPDATE_KEY,new String[] {key});
+        return rowId;
+    }
+
+    public byte[] getImage(String key){
+        SQLiteDatabase database = getWritableDatabase();
+        Cursor cursor = database.rawQuery(PictureContract.GET_KEY,new String[] {key});
+        cursor.moveToFirst();
+        if(cursor.getCount() == 0){
+            return null;
+        }
+        byte[] picture = cursor.getBlob(0);
+        cursor.close();
+        return picture;
+    }
+
+    public DataBaseHelper dropTable(Context context){
+        SQLiteDatabase database = getWritableDatabase();
+        database.execSQL(PictureContract.DROP_TABLE);
+        context.deleteDatabase(PictureContract.NAME);
+        return new DataBaseHelper(context);
+
+    }
+
+    public void deleteImage(String key){
+        SQLiteDatabase database = getWritableDatabase();
+        database.delete(PictureContract.FeedEntry.TABLE_NAME,PictureContract.UPDATE_KEY, new String[] {key});
     }
 }
